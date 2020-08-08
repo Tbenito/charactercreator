@@ -95,21 +95,17 @@ function hideArray (competition) {
 
 function showId (id) {
   var showList = []
-  var inMuliLayer = false
+  //var inMuliLayer = false
   var svgContainer = document.querySelector('#svg1')
-  ga('send', 'event', 'menu', 'select', id)
+  var layerCount = isInMultiLayerArray(id.slice(1), multiLayer)
+  gaga('send', 'event', 'menu', 'select', id)
 
-  for (lyr in multiLayer) {
-    if (id.slice(1) == multiLayer[lyr][0]) {
-      inMuliLayer = true
-      for (var i = 1; i <= multiLayer[lyr][1]; i++) {
-        idOf = id + '_' + i + '_of_' + multiLayer[lyr][1]
-        showList.push(idOf.slice(1))
-      }
+  if (layerCount > 0) {
+    for (var i = 1; i <= layerCount; i++) {
+      idOf = id + '_' + i + '_of_' + layerCount
+      showList.push(idOf.slice(1))
     }
-  };
-
-  if (inMuliLayer === false) {
+  } else {
     showList.push(id.slice(1))
   }
   loadFilesFromList(showList)
@@ -118,23 +114,22 @@ function showId (id) {
 function hideId (id) {
   var svgContainer = document.querySelector('#svg1')
   var layerToHide
+  var layerCount = isInMultiLayerArray(id.slice(1), multiLayer)
 
-  for (lyr in multiLayer) {
-    if (id.slice(1) == multiLayer[lyr][0]) {
-      for (var i = 1; i <= multiLayer[lyr][1]; i++) {
-        idOf = id + '_' + i + '_of_' + multiLayer[lyr][1]
-        layerToHide = svgContainer.querySelector(idOf)
-        if (layerToHide != null) {
-          svgContainer.removeChild(layerToHide)
-        }
-      }
-    } else {
-      layerToHide = svgContainer.querySelector(id)
+  if (layerCount > 0) {
+    for (var i = 1; i <= layerCount; i++) {
+      idOf = id + '_' + i + '_of_' + layerCount
+      layerToHide = svgContainer.querySelector(idOf)
       if (layerToHide != null) {
         svgContainer.removeChild(layerToHide)
       }
     }
-  };
+  } else {
+    layerToHide = svgContainer.querySelector(id)
+    if (layerToHide != null) {
+      svgContainer.removeChild(layerToHide)
+    }
+  }
 }
 
 function getOptionsRandom (section) {
@@ -158,7 +153,7 @@ function smartRandomStream () {
 }
 
 function smartRandomSingle (ev) {
-  ga('send', 'event', { eventCategory: 'Secret function', eventAction: 'smartRandomSingle()', eventLabel: 'Secret Patreon reveal for new random function.' })
+  gaga('send', 'event', { eventCategory: 'Secret function', eventAction: 'smartRandomSingle()', eventLabel: 'Secret Patreon reveal for new random function.' })
   var roll
   var skinTones = ['#FFDFC4', '#F0D5BE', '#EECEB3', '#E1B899', '#E5C298', '#FFDCB2', '#E5B887', '#E5A073', '#E79E6D', '#DB9065', '#CE967C', '#C67856', '#BA6C49', '#A57257', '#F0C8C9', '#DDA8A0', '#B97C6D', '#A8756C', '#AD6452', '#5C3836', '#CB8442', '#BD723C', '#704139', '#A3866A']
   var obj = new Array()
@@ -188,6 +183,7 @@ function smartRandomSingle (ev) {
     glasses: 60,
     holster: 5,
     horns: 3,
+    kneepads: 5,
     makeup: 80,
     mask: 5,
     necklace: 75,
@@ -239,8 +235,8 @@ function smartRandomSingle (ev) {
   roll = Math.floor((Math.random() * 24))
   newColor = obj.skinColor = skinTones[roll].toLowerCase()
   hash.add(obj)
-  defaultEyeColor(newColor)
-  defaultHairColor(newColor)
+  defaultEyeColor(c, newColor)
+  defaultHairColor(c, newColor)
   defaultPupilShape()
   fabRoll = Math.floor((Math.random() * fabColorCounter))
   fabColor = fabricPallette[fabRoll]
@@ -418,7 +414,7 @@ function coverAll (forms) {
     keys = Object.keys(categories)
     keyCounter = keyLen = keys.length
 
-    if (isInArray(capitalizeFirstLetter(catKey), keys)) {
+    if (keys.includes(capitalizeFirstLetter(catKey))) {
       items = categories[capitalizeFirstLetter(catKey)]
       itemsLen = items.length
       roll = Math.floor((Math.random() * (itemsLen - 1))) + 1
@@ -445,7 +441,7 @@ function coverTop (forms) {
     keys = Object.keys(categories)
     keyCounter = keyLen = keys.length
 
-    if (isInArray(capitalizeFirstLetter(catKey), keys)) {
+    if (keys.includes(capitalizeFirstLetter(catKey))) {
       items = categories[capitalizeFirstLetter(catKey)]
       itemsLen = items.length
       roll = Math.floor((Math.random() * (itemsLen - 1))) + 1
@@ -480,7 +476,7 @@ function coverBottom (forms) {
     keys = Object.keys(categories)
     keyCounter = keyLen = keys.length
 
-    if (isInArray(capitalizeFirstLetter(catKey), keys)) {
+    if (keys.includes(capitalizeFirstLetter(catKey))) {
       items = categories[capitalizeFirstLetter(catKey)]
       itemsLen = items.length
       roll = Math.floor((Math.random() * (itemsLen - 1))) + 1

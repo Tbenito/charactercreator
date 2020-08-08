@@ -1,3 +1,109 @@
+"use strict"
+
+window.maleBodyPositionFolder = 'body_front_swaying'
+window.femaleBodyPositionFolder = 'body_front_hand-on-hip'
+
+const femaleHead = fetch('/layer/female/head_front_default/layers.json')
+.then(function (res) {
+  return res.json()
+})
+.catch(console.error)
+
+const femaleBody = fetch('/layer/female/' + window.femaleBodyPositionFolder + '/layers.json')
+.then(function (res) {
+  return res.json()
+})
+.catch(console.error)
+
+const maleHead = fetch('/layer/male/head_front_default/layers.json')
+.then(function (res) {
+  return res.json()
+})
+.catch(console.error)
+
+const maleBody = fetch('/layer/male/' + window.maleBodyPositionFolder + '/layers.json')
+.then(function (res) {
+  return res.json()
+})
+.catch(console.error)
+
+Promise.all([maleHead, maleBody])
+  .then(function([maleHead, maleBody]) {
+    window.layersMale = assembleLayers(maleBody, maleHead, window.maleBodyPositionFolder, 'head_front_default')
+    window.maleHead = maleHead
+    window.maleBody = maleBody
+  })
+
+Promise.all([femaleHead, femaleBody])
+  .then(function([femaleHead, femaleBody]) {
+    window.layersFemale  = assembleLayers(femaleBody, femaleHead, window.femaleBodyPositionFolder, 'head_front_default')
+    window.femaleHead = femaleHead
+    window.femaleBody = femaleBody
+  })
+
+function assembleLayers (bodyObject, headObject, bodyPosition, headPosition) {
+  var layers = []
+  var sourceLayers =[]
+  var counter
+  if (bodyObject.bodyBack) {
+    counter = bodyObject.bodyBack.length
+    total = counter
+    while (counter--) {
+      layers.push(bodyObject.bodyBack[total - (counter + 1)])
+    }
+  }
+  if (headObject.headBack) {
+    counter = headObject.headBack.length
+    total = counter
+    while (counter--) {
+      layers.push(headObject.headBack[total - (counter + 1)])
+    }
+  }
+  if (bodyObject.bodyMiddle) {
+    counter = bodyObject.bodyMiddle.length
+    total = counter
+    while (counter--) {
+      layers.push(bodyObject.bodyMiddle[total - (counter + 1)])
+    }
+  }
+  if (headObject.headMiddle) {
+    counter = headObject.headMiddle.length
+    total = counter
+    while (counter--) {
+      layers.push(headObject.headMiddle[total - (counter + 1)])
+    }
+  }
+  if (bodyObject.bodyFront) {
+    counter = bodyObject.bodyFront.length
+    total = counter
+    while (counter--) {
+      layers.push(bodyObject.bodyFront[total - (counter + 1)])
+    }
+  }
+  if (headObject.headFront) {
+    counter = headObject.headFront.length
+    total = counter
+    while (counter--) {
+      layers.push(headObject.headFront[total - (counter + 1)])
+    }
+  }
+  if (bodyObject.bodyOver) {
+    counter = bodyObject.bodyOver.length
+    total = counter
+    while (counter--) {
+      layers.push(bodyObject.bodyOver[total - (counter + 1)])
+    }
+  }
+  if (headObject.headOver) {
+    counter = headObject.headOver.length
+    total = counter
+    while (counter--) {
+      layers.push(headObject.headOver[total - (counter + 1)])
+    }
+  }
+  return layers
+}
+
 window.onload = function () {
   var c // Main variable to hold user choices and preferences
   var aboutBtn = document.querySelector('#aboutButton')
@@ -20,12 +126,14 @@ window.onload = function () {
   var patreonBtn = document.querySelector('#patreon-btn')
   var braveAffiliateBtn = document.querySelector('#brave-affiliate-btn')
   var newCharBtn = document.querySelector('#new-char-btn')
-  var saveCharToCloudBtn = document.querySelector('#save-char-to-cloud-btn')
+  // var saveCharToCloudBtn = document.querySelector('#save-char-to-cloud-btn')
   var loadCharBtn = document.querySelector('#load-char-btn')
   var nightModeBtn = document.querySelector('#nightModeButton')
   var bigRedBtn = document.querySelector('#bigRedButton')
   var downloadBtn = document.querySelector('#proceed-download')
+  var homeBtn = document.querySelector('.site-title')
 
+  if (homeBtn && typeof gotoNewChar === 'function') { homeBtn.addEventListener('click', gotoNewChar, false) }
   if (aboutBtn && typeof showAbout === 'function') { aboutBtn.addEventListener('click', showAbout, false) }
   if (faqBtn && typeof showFAQ === 'function') { faqBtn.addEventListener('click', showFAQ, false) }
   if (shopBtn && typeof showShop === 'function') { shopBtn.addEventListener('click', showShop, false) }
@@ -45,7 +153,7 @@ window.onload = function () {
   if (patreonBtn && typeof gotoPatreon === 'function') { patreonBtn.addEventListener('click', gotoPatreon, false) }
   if (braveAffiliateBtn && typeof gotoBrave === 'function') { braveAffiliateBtn.addEventListener('click', gotoBrave, false) }
   if (newCharBtn && typeof gotoNewChar === 'function') { newCharBtn.addEventListener('click', gotoNewChar, false) }
-  if (saveCharToCloudBtn && typeof saveCharToCloud === 'function') { saveCharToCloudBtn.addEventListener('click', saveCharToCloud, false) }
+  // if (saveCharToCloudBtn && typeof saveCharToCloud === 'function') { saveCharToCloudBtn.addEventListener('click', saveCharToCloud, false) }
   if (loadCharBtn && typeof gotoLoadChar === 'function') { loadCharBtn.addEventListener('click', gotoLoadChar, false) }
   if (nightModeBtn && typeof switchNightMode === 'function') { nightModeBtn.addEventListener('click', switchNightMode, false) }
   if (bigRedBtn && typeof smartRandomSingle === 'function') { bigRedBtn.addEventListener('click', smartRandomSingle, false) }
@@ -55,14 +163,16 @@ window.onload = function () {
   startup()
 }
 
+/*
 function saveCharToCloud (ev) {
   preventDefault(ev)
-  consolelog('saveCharToCloud')
+  // consolelog('saveCharToCloud')
   // Close current modal
   // Check if user is logged in
   // Check if this character already exists in the cast
   // If not, prompt to name the character in the cast modal
 }
+*/
 
 function checkNightMode () {
   var body = document.querySelector('BODY')
@@ -75,7 +185,7 @@ function checkNightMode () {
 
 function switchNightMode (ev) {
   // document.documentElement.setAttribute('data-theme', 'lighttheme');
-  ga('send', 'event', { eventCategory: 'Navigation', eventAction: 'Dark/Light', eventLabel: 'Switch between Dark mode and Light mode' })
+  gaga('send', 'event', { eventCategory: 'Navigation', eventAction: 'Dark/Light', eventLabel: 'Switch between Dark mode and Light mode' })
   ev.preventDefault()
   var body = document.querySelector('BODY')
   hamburger()
@@ -89,14 +199,14 @@ function switchNightMode (ev) {
 }
 
 function tattle () {
-  ga('send', 'event', { eventCategory: 'Conversion', eventAction: 'Navbar | Patreon', eventLabel: 'Open Patreon page from the Navbar/Hamburger menu.' })
+  gaga('send', 'event', { eventCategory: 'Conversion', eventAction: 'Navbar | Patreon', eventLabel: 'Open Patreon page from the Navbar/Hamburger menu.' })
 }
 
 function gotoPatreon (evt) {
   if (evt) {
     evt.preventDefault()
   }
-  ga('send', 'event', { eventCategory: 'Conversion', eventAction: 'Caboose | Patreon', eventLabel: 'Open Patreon page from Caboose modal.' })
+  gaga('send', 'event', { eventCategory: 'Conversion', eventAction: 'Caboose | Patreon', eventLabel: 'Open Patreon page from Caboose modal.' })
   closeAllOverlays()
   setTimeout(function () { window.open('https://www.patreon.com/charactercreator') }, 500)
 }
@@ -105,9 +215,9 @@ function gotoBrave (evt) {
   if (evt) {
     evt.preventDefault()
   }
-  ga('send', 'event', { eventCategory: 'Conversion', eventAction: 'Caboose | Brave', eventLabel: 'Open Brave Browser page from Caboose modal.' })
+  gaga('send', 'event', { eventCategory: 'Conversion', eventAction: 'Caboose | Brave', eventLabel: 'Open Brave Browser page from Caboose modal.' })
   closeAllOverlays()
-  consolelog('brave')
+  // consolelog('brave')
   setTimeout(function () { window.open('https://brave.com/cha553') }, 500)
 }
 
@@ -115,8 +225,9 @@ function gotoNewChar (evt) {
   if (evt) {
     evt.preventDefault()
   }
-  ga('send', 'event', { eventCategory: 'Conversion', eventAction: 'Caboose | New character', eventLabel: 'Reset to new character from Caboose.' })
+  gaga('send', 'event', { eventCategory: 'Conversion', eventAction: 'Caboose | New character', eventLabel: 'Reset to new character from Caboose.' })
   closeAllOverlays()
+  window.location.hash ='';
   setTimeout(function () {
     resetCharacter()
   }, 500)
@@ -193,7 +304,7 @@ function fadeInSVG () {
 }
 
 function resetSilhouettes () {
-  var defaultColor = '#e35a4e'
+  var defaultColor = 'currentColor'
   var svgContainer = document.querySelector('#svg1')
   var maleSilhouette = svgContainer.querySelector('#path_male')
   var femaleSilhouette = svgContainer.querySelector('#path_female')
@@ -234,8 +345,8 @@ function caboose () {
 }
 
 function layerHighlight (ev) {
-  var el = ev.target
-  var el = getGroupParent(el)
+  var el = getGroupParent(ev.target)
+  if (!el) return
   var masks = document.querySelectorAll('#contour use')
   var masksLen = masks.length
 
@@ -252,24 +363,22 @@ function layerHighlight (ev) {
   }
 }
 
-function getViewBoxOnClick (el) {
+/*
+function getViewBoxOnClick () {
+  // return '10 50 540 540'
   var viewBox = '10 50 540 540'
   var svgContainer = document.querySelector('#svg1')
-  consolelog('SVG1', svgContainer.viewBox)
-  consolelog('SVG1', svgContainer.viewBox.baseVal)
-  consolelog(el.getBoundingClientRect())
+  // consolelog('SVG1', svgContainer.viewBox)
+  // consolelog('SVG1', svgContainer.viewBox.baseVal)
+  // consolelog(el.getBoundingClientRect())
   return viewBox
 }
+*/
 
 function clickSelect (ev) {
-  var el = ev.target
-  var viewBox = getViewBoxOnClick(el)
-  var el = getGroupParent(el)
-  // consolelog('el',el);
-  // consolelog('viewBox',viewBox);
+  var el = getGroupParent(ev.target)
   // TODO check if style selection screen, return
   var formSection
-  var sidebarLeft = document.querySelector('#sidebar-left')
   var sectionList = document.querySelectorAll('section.accordeon__section-label')
   var isClosed
   var sectionLabel
@@ -349,6 +458,7 @@ function getLayers () {
 
 function getGroupParent (el) {
   var layers = getLayers()
+  if (!layers.indexOf) return
   while (layers.indexOf(el.id) === -1 && el.tagName != 'svg') {
     el = el.parentNode
   }
@@ -360,16 +470,35 @@ function getMultiLayer () {
   var layers = getLayers()
   var counter = layers.length
   var singleArray
+  var layerCount
 
   while (counter--) {
-    if (layers[counter].slice(-6, -1) === '1_of_') {
+    layerCount = isMultiLayer(layers[counter])
+    if (layerCount > 0) {
       singleArray = []
       singleArray.push(layers[counter].slice(0, -7))
-      singleArray.push(Number(layers[counter].slice(-1)))
+      singleArray.push(layerCount)
       multiLayer.push(singleArray)
     }
   }
   return multiLayer
+}
+
+function isMultiLayer (layer) {
+  if (layer.slice(-6, -1) === '1_of_') {
+    return parseInt(layer.slice(-1), 10)
+  } else {
+    return 0
+  }
+}
+
+function isInMultiLayerArray (id, multiLayer) {
+  for (entry in multiLayer) {
+      if (id === multiLayer[entry][0]) {
+        return multiLayer[entry][1]
+      }
+  }
+  return 0
 }
 
 function getHairLayers () {
@@ -400,7 +529,7 @@ function getSkinLayers () {
 }
 
 function fromItemGetPrefix (id) {
-  consolelog('fromItemGetPrefix', id)
+  // consolelog('fromItemGetPrefix', id)
   var idList = id.split('_')
   var prefix
 
@@ -413,11 +542,11 @@ function fromItemGetPrefix (id) {
 }
 
 function fromPrefixGetFormSection (prefix) {
-  consolelog('prefix', prefix)
-  var item
+  // consolelog('prefix', prefix)
+  // var item
   var formSection
   var counterForm
-  var counterSection
+  // var counterSection
   var formList
 
   if (c.choices.sex === 'm') {
@@ -425,7 +554,7 @@ function fromPrefixGetFormSection (prefix) {
   } else {
     formList = window.femaleFormList
   }
-  consolelog('formList', formList)
+  // consolelog('formList', formList)
 
   while (formSection === undefined) {
     counterForm = formList.length
@@ -477,10 +606,11 @@ function launch () {
   window.forms = [form1, form2, form3, form4, form5, form6]
   // Get all the hash key/value pairs and include them in the c.choices object
   // Go through all the forms
-  parseHash(c, forms, skinLayers, hairLayers) // Hashed elements are added in the character object
+  parseHash(forms, skinLayers, hairLayers) // Hashed elements are added in the character object
   choicesToList(c)
-  toBeShown = choicesToLayers(c, multiLayer)
-  Promise.resolve().then(function () { loadFilesFromList(toBeShown) }).then(function () { onAllLoaded() }).then(function () { applyClipPath() })
+
+  const toBeShown = choicesToLayers(c, multiLayer)
+  Promise.resolve().then(function () { loadFilesFromList(toBeShown) }).then(function () { onAllLoaded() }).then(function () { applyClipPath(c) })
 }
 
 function displayPallette () {
@@ -497,7 +627,7 @@ function displayPallette () {
 }
 
 function chooseSkinColor () {
-  var skinTones = ['#FFDFC4', '#F0D5BE', '#EECEB3', '#E1B899', '#E5C298', '#FFDCB2', '#E5B887', '#E5A073', '#E79E6D', '#DB9065', '#CE967C', '#C67856', '#BA6C49', '#A57257', '#F0C8C9', '#DDA8A0', '#B97C6D', '#A8756C', '#AD6452', '#5C3836', '#CB8442', '#BD723C', '#704139', '#A3866A']
+  // find 'skinTones' in global.js
   var gmenu = document.querySelector('.skin-color__container')
 
   if (!gmenu.firstChild) {
@@ -550,11 +680,11 @@ function colorCutout (newColor) {
 
   gmenu.classList.remove('skin-color__container--show')
   hash.add(obj)
-  defaultEyeColor(newColor)
-  defaultHairColor(newColor)
+  defaultEyeColor(c, newColor)
+  defaultHairColor(c, newColor)
   defaultPupilShape()
 
-  ga('send', 'event', { eventCategory: 'Navigation', eventAction: 'Color', eventLabel: 'Select color' })
+  gaga('send', 'event', { eventCategory: 'Navigation', eventAction: 'Color', eventLabel: 'Select color' })
 
   addDecency()
   addTopicalItem()
@@ -590,7 +720,7 @@ function selectMale (event) {
   shadow.classList.add('shine')
 
   if (event) {
-    ga('send', 'event', { eventCategory: 'Navigation', eventAction: 'Male', eventLabel: 'Select male template' })
+    gaga('send', 'event', { eventCategory: 'Navigation', eventAction: 'Male', eventLabel: 'Select male template' })
   }
 
   setTimeout(function () {
@@ -635,7 +765,7 @@ function selectFemale (event) {
   shadow.classList.add('shine')
 
   if (event) {
-    ga('send', 'event', { eventCategory: 'Navigation', eventAction: 'Female', eventLabel: 'Select female template' })
+    gaga('send', 'event', { eventCategory: 'Navigation', eventAction: 'Female', eventLabel: 'Select female template' })
   }
 
   setTimeout(function () {
@@ -645,22 +775,25 @@ function selectFemale (event) {
 
 function presentFaceStyles () {
   var sex = c.choices.sex
-  consolelog('sex', sex)
-  consolelog('presentFaceStyles')
+  // consolelog('sex', sex)
+  // consolelog('presentFaceStyles')
   var faceWestern
   var faceAnime
   var faceContainer = document.querySelector('.face-styles')
-  var faceStyle = faceContainer.querySelector('STYLE')
-  consolelog('faceContainer', faceStyle)
+  // var faceStyle = faceContainer.querySelector('STYLE')
+  // consolelog('faceContainer', faceStyle)
 
   //   if (c.choices.faceStyle) {
   //     launch();
   //     return;
   //   }
-  //
+
   colorSilhouette()
   zoomTwoFaces()
-  //
+
+  var hideWestern
+  var hideAnime
+
   if (sex === 'm') {
     faceWestern = document.querySelector('.male-face-western-style')
     faceAnime = document.querySelector('.male-face-anime-style')
@@ -693,7 +826,7 @@ function presentFaceStyles () {
 }
 
 function selectStyleWestern () {
-  consolelog('selectStyleWestern')
+  // consolelog('selectStyleWestern')
 
   // TODO Transform Translate horizontaly to match face on head;
 
@@ -701,7 +834,7 @@ function selectStyleWestern () {
 }
 
 function selectStyleAnime () {
-  consolelog('selectStyleAnime')
+  // consolelog('selectStyleAnime')
 
   // TODO Transform Translate horizontaly to match face on head;
 

@@ -43,8 +43,8 @@ function createForm (sex, forms) {
 
         var viewBox = getViewBox(t, d)
 
-        consolelog('t', t)
-        consolelog('d', d)
+        // consolelog('t', t)
+        // consolelog('d', d)
 
         if (d === '') { svgContent = '<use xlink:href="#icon-none"></use>' } else { svgContent = '' }
         newHtml += '    <div class="option__container option__' + t + '_' + d + '" tabindex="0"><svg viewBox="' + viewBox + '" class="svg__option ' + t + '_' + d + '">' + svgContent + '</svg><span class="option__label">' + d + '</span></div>'
@@ -69,7 +69,7 @@ function createForm (sex, forms) {
       newHtml += '    </div>'
       newHtml += '</div>'
       selcount++
-      consolelog('newHtml', newHtml)
+      // consolelog('newHtml', newHtml)
     }
     sectionHtml += '</div>'
     var htmlObject = document.createElement('div')
@@ -100,17 +100,14 @@ function createForm (sex, forms) {
 
 function getSectionsFromIdMultiLayer (multiLayer, tempId) {
   var sections = []
-
-  for (lyr in multiLayer) {
-    if (tempId.slice(1) === multiLayer[lyr][0]) {
-      for (var i = 1; i <= multiLayer[lyr][1]; i++) {
-        newLayer = tempId + '_' + i + '_of_' + multiLayer[lyr][1]
-        sections.push(newLayer)
-      }
+  var layerCount = isInMultiLayerArray(tempId.slice(1), multiLayer)
+  if (layerCount > 0) {
+    for (var i = 1; i <= layerCount; i++) {
+      newLayer = tempId + '_' + i + '_of_' + layerCount
+      sections.push(newLayer)
     }
-    if (sections.length === 0) {
-      sections = [tempId]
-    }
+  } else {
+    sections = [tempId]
   }
   return sections
 }
@@ -168,7 +165,7 @@ function replaceMultilayer (layersList, section) {
 
   while (multiCounter--) {
     currentItem = multiLayer[multiCounter][0]
-    if (isInArray(currentItem, fullList)) {
+    if (fullList.includes(currentItem)) {
       currentIndex = fullList.indexOf(currentItem)
       fullList.splice(currentIndex, 1)
       currentQty = multiLayer[multiCounter][1]
@@ -204,6 +201,23 @@ function loadSectionLayers (section, layersList, callback, callbackLoopFlag) {
   loadFilesFromList(layersList, callback, callbackLoopFlag)
 }
 
+function getPositionDir (layer) {
+  // Apply the right subfolder when loading files
+  var positionDir
+  var sex = c.choices.sex
+
+  if (sex === 'm' && ((window.maleBody.bodyBack && window.maleBody.bodyBack.indexOf(layer) > -1 )  || (window.maleBody.bodyMiddle && window.maleBody.bodyMiddle.indexOf(layer) > -1 )  || (window.maleBody.bodyFront && window.maleBody.bodyFront.indexOf(layer) > -1 )  || (window.maleBody.bodyOver && window.maleBody.bodyOver.indexOf(layer) > -1 ))) {
+    positionDir = window.maleBodyPositionFolder + '/'
+  } else if (sex === 'm' && ((window.maleHead.headBack && window.maleHead.headBack.indexOf(layer) > -1 )  || (window.maleHead.headMiddle && window.maleHead.headMiddle.indexOf(layer) > -1 ) || (window.maleHead.headFront && window.maleHead.headFront.indexOf(layer) > -1 ) || (window.maleHead.headOver && window.maleHead.headOver.indexOf(layer) > -1 ))) {
+    positionDir = 'head_front_default/'
+  } else if (sex === 'f' && ((window.femaleBody.bodyBack && window.femaleBody.bodyBack.indexOf(layer) > -1 ) || (window.femaleBody.bodyMiddle && window.femaleBody.bodyMiddle.indexOf(layer) > -1 ) || (window.femaleBody.bodyFront && window.femaleBody.bodyFront.indexOf(layer) > -1 ) || (window.femaleBody.bodyOver && window.femaleBody.bodyOver.indexOf(layer) > -1 ))) {
+    positionDir = window.femaleBodyPositionFolder + '/'
+  } else if (sex === 'f' && ((window.femaleHead.headBack && window.femaleHead.headBack.indexOf(layer) > -1 ) || (window.femaleHead.headMiddle && window.femaleHead.headMiddle.indexOf(layer) > -1 ) || (window.femaleHead.headFront && window.femaleHead.headFront.indexOf(layer) > -1 ) || (window.femaleHead.headOver && window.femaleHead.headOver.indexOf(layer) > -1 ))) {
+    positionDir = 'head_front_default/'
+  }
+  return positionDir
+}
+
 function loadFilesFromList (layersList, callback, callbackLoopFlag) {
   var layerDirectory
   var sex = c.choices.sex
@@ -211,6 +225,7 @@ function loadFilesFromList (layersList, callback, callbackLoopFlag) {
   var layerID
   var counter
   var layers
+  var positionDir
 
   if (sex === 'm') {
     layerDirectory = 'layer/male/'
@@ -229,7 +244,10 @@ function loadFilesFromList (layersList, callback, callbackLoopFlag) {
       continue
     }
 
-    file = layerDirectory + layerID + '.svg'
+    positionDir = getPositionDir(layerID)
+    console.log('positionDir', positionDir)
+    file = layerDirectory + positionDir + layerID + '.svg'
+
     fetch(file).then(function (response) {
       return response.text()
     }).then(function (text) {

@@ -17,11 +17,22 @@ The aim of this project is to create a fast, intuitive user interface for produc
 
 # Getting Started
 
-Install the dependencies:
+## Install the dependencies:
 
 npm install
 
-Install CouchDB
+cp config-sample.json config.json # or edit existing config.json
+
+The config.json keys "extraPort", "secret" and "formUrl" are all optional. "formUrl" is the URL of the form at the client's site. "secret" is used to sign the cookie, make it a long randomstring. "extraPort" defaults to 3000.
+
+In dev mode, set "secret" (random) and "formUrl" to "http://localhost:5000/fake-form" to test form.
+
+- npm run build # dev build in src/
+- npm run prod # production build in prod/
+- npm run dev # (was npm start) launch dev web server; caddy is used in prod
+- npm start # (was scripts/s2p.js) launch backend to handle form post and image conversions
+
+## Install CouchDB
 
 Get the site up and running on your local machine:
 
@@ -36,6 +47,8 @@ npm run clean # delete built files in prod/ and src/dist/
 
 
 # Site Architecture
+
+![function-calls](https://raw.githubusercontent.com/ubik23/charactercreator/master/scripts/function-calls.jpg)
 
 The project is still in its alpha stage, so you might find some legacy code from when the project was created in 2014. I try to keep it up to date but some parts get neglected in favor of new shiny features.
 
